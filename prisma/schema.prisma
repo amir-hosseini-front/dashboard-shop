@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" 
+}
+
+// ==========================================
+// مدل User (کاربران)
+// ==========================================
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  products  Product[]  // رابطه با محصولات
+}
+
+// ==========================================
+// مدل Product (محصولات)
+// ==========================================
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  stock     Int
+  status    String   @default("موجود")
+  userId    String?  // کلید خارجی به User
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
