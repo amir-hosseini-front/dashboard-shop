@@ -1,33 +1,92 @@
-export default function OrdersPage() {
-  // لیست سفارشات نمونه
-  const orders = [
-    { id: '#۱۰۰۱', customer: 'علی محمدی', amount: '۲,۴۵۰,۰۰۰', status: 'پرداخت شده', date: '۱۴۰۵/۰۴/۲۵' },
-    { id: '#۱۰۰۲', customer: 'سارا احمدی', amount: '۸۹۰,۰۰۰', status: 'در انتظار', date: '۱۴۰۵/۰۴/۲۴' },
-    { id: '#۱۰۰۳', customer: 'رضا کریمی', amount: '۵,۶۰۰,۰۰۰', status: 'پرداخت شده', date: '۱۴۰۵/۰۴/۲۴' },
-    { id: '#۱۰۰۴', customer: 'مریم حسینی', amount: '۱,۲۰۰,۰۰۰', status: 'لغو شده', date: '۱۴۰۵/۰۴/۲۳' },
-    { id: '#۱۰۰۵', customer: 'احمد نوری', amount: '۳,۳۰۰,۰۰۰', status: 'در انتظار', date: '۱۴۰۵/۰۴/۲۳' },
-    { id: '#۱۰۰۶', customer: 'زهرا رضایی', amount: '۴,۲۰۰,۰۰۰', status: 'پرداخت شده', date: '۱۴۰۵/۰۴/۲۲' },
-  ];
+"use client";
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'پرداخت شده': return 'bg-green-100 text-green-800';
-      case 'در انتظار': return 'bg-yellow-100 text-yellow-800';
-      case 'لغو شده': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+import { fetchOrders } from "@/lib/api/orders";
+import { useEffect, useState } from "react";
+interface Order {
+  id: string;
+  customer: string;
+  amount: string;
+  status: string;
+  date: string;
+}
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersFiltered, setOrdersFiltered] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("همه سفارشات");
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const data = await fetchOrders();
+      setOrders(data);
+      setOrdersFiltered(data);
+    } catch (err) {
+      setError("خطا در دریافت محصولات");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
+  const handleStatusChange = (event: any) => {
+    setSelectedStatus(event.target.value);
+    setOrdersFiltered(filterOrders(event.target.value));
+  };
 
+  const filterOrders = (value: string) => {
+    if (value === "همه سفارشات") {
+      return orders;
+    } else {
+      return orders.filter((order: Order) => order.status === value);
+    }
+  };
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "پرداخت شده":
+        return "bg-green-100 text-green-800";
+      case "در انتظار":
+        return "bg-yellow-100 text-yellow-800";
+      case "لغو شده":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-xl text-gray-600">در حال بارگذاری...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-xl text-red-600">{error}</div>
+      </div>
+    );
+  }
   return (
-    <div>
+    <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800">🛒 مدیریت سفارشات</h1>
         <div className="flex gap-2">
-          <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-            <option>همه سفارشات</option>
-            <option>پرداخت شده</option>
-            <option>در انتظار</option>
-            <option>لغو شده</option>
+          <select
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            value={selectedStatus}
+            onChange={handleStatusChange}
+          >
+            <option value="همه سفارشات">همه سفارشات</option>
+            <option value="پرداخت شده">پرداخت شده</option>
+            <option value="در انتظار">در انتظار</option>
+            <option value="لغو شده">لغو شده</option>
           </select>
         </div>
       </div>
@@ -44,13 +103,20 @@ export default function OrdersPage() {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, index) => (
-              <tr key={index} className="border-t border-gray-100 hover:bg-gray-50 transition">
+            {ordersFiltered.map((order, index) => (
+              <tr
+                key={index}
+                className="border-t border-gray-100 hover:bg-gray-50 transition"
+              >
                 <td className="p-4 text-gray-800 font-medium">{order.id}</td>
                 <td className="p-4 text-gray-800">{order.customer}</td>
-                <td className="p-4 text-gray-800 font-medium">{order.amount}</td>
+                <td className="p-4 text-gray-800 font-medium">
+                  {order.amount}
+                </td>
                 <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
+                  >
                     {order.status}
                   </span>
                 </td>

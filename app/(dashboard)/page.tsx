@@ -10,7 +10,6 @@ export default function DashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // گرفتن اطلاعات کاربر از لوکال‌استوریج
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
@@ -24,7 +23,6 @@ export default function DashboardPage() {
     }
   }, [router]);
 
-  // گرفتن لیست محصولات
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -41,7 +39,6 @@ export default function DashboardPage() {
     fetchProducts();
   }, []);
 
-  // خروج از حساب
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -65,7 +62,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto px-4 py-8">
-        {/* هدر */}
         <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow">
           <h1 className="text-2xl font-bold">پنل مدیریت</h1>
           <div className="flex items-center gap-4">
@@ -81,7 +77,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* آمار سریع */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white p-6 rounded-lg shadow text-center">
             <div className="text-3xl font-bold text-blue-600">
@@ -103,7 +98,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* جدول محصولات */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="p-4 border-b">
             <h2 className="text-xl font-bold">مدیریت محصولات</h2>

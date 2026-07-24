@@ -1,4 +1,4 @@
-import { products } from "@/lib/api";
+import { products } from "@/lib/api/products";
 import { NextResponse } from "next/server";
 
 export async function GET(
