@@ -6,7 +6,7 @@ import {
   deleteProduct,
   fetchProducts,
   updateProduct,
-} from "@/lib/api";
+} from "@/lib/api/products";
 import { useEffect, useState } from "react";
 
 interface Product {

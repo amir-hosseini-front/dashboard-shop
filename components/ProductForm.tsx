@@ -1,6 +1,6 @@
 "use client";
 
-import { createProduct, updateProduct } from "@/lib/api";
+import { createProduct, updateProduct } from "@/lib/api/products";
 import { useState, useEffect } from "react";
 
 interface Product {
