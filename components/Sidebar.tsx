@@ -1,34 +1,33 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { 
-  HomeIcon, 
-  ChartBarIcon, 
-  UserGroupIcon, 
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  HomeIcon,
+  ChartBarIcon,
+  UserGroupIcon,
   Cog6ToothIcon,
-  ShoppingBagIcon,  // جدید
-  ShoppingCartIcon , // جدید
-ArrowRightOnRectangleIcon  
-} from '@heroicons/react/24/outline';
+  ShoppingBagIcon, // جدید
+  ShoppingCartIcon, // جدید
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 
 const navigation = [
-  { name: 'داشبورد', href: '/', icon: HomeIcon },
-  { name: 'محصولات', href: '/products', icon: ShoppingBagIcon },    // جدید
-  { name: 'سفارشات', href: '/orders', icon: ShoppingCartIcon },    // جدید
-  { name: 'آمار', href: '/stats', icon: ChartBarIcon },
-  { name: 'کاربران', href: '/users', icon: UserGroupIcon },
-  { name: 'تنظیمات', href: '/settings', icon: Cog6ToothIcon },
+  { name: "داشبورد", href: "/", icon: HomeIcon },
+  { name: "محصولات", href: "/products", icon: ShoppingBagIcon }, // جدید
+  { name: "سفارشات", href: "/orders", icon: ShoppingCartIcon }, // جدید
+  { name: "آمار", href: "/statistics", icon: ChartBarIcon },
+  { name: "کاربران", href: "/users", icon: UserGroupIcon },
+  { name: "تنظیمات", href: "/settings", icon: Cog6ToothIcon },
 ];
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('user');
-    router.push('/login');
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
+    router.push("/login");
   };
-
 
   return (
     <aside className="w-64 bg-gray-900 text-white h-screen p-4 fixed right-0 top-0">
@@ -47,8 +46,8 @@ export default function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
               }`}
             >
               <item.icon className="w-6 h-6" />

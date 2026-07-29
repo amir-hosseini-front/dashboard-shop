@@ -1,9 +1,37 @@
 const API_BASE = "/api";
 export let products = [
-  { id: 1, name: "کیک چرمی", price: 45000, stock: 45, status: "موجود" },
-  { id: 2, name: "کشو اسپرت", price: 120000, stock: 12, status: "موجود" },
-  { id: 3, name: "ساعت هوشمند", price: 0, stock: 0, status: "ناموجود" },
-  { id: 4, name: "هدفون بی‌سیم", price: 230000, stock: 23, status: "موجود" },
+  {
+    id: 1,
+    name: "کیک چرمی",
+    price: 45000,
+    stock: 45,
+    status: "موجود",
+    createdAt: new Date("2026-01-15"),
+  },
+  {
+    id: 2,
+    name: "کشو اسپرت",
+    price: 120000,
+    stock: 12,
+    status: "موجود",
+    createdAt: new Date("2026-01-20"),
+  },
+  {
+    id: 3,
+    name: "ساعت هوشمند",
+    price: 0,
+    stock: 0,
+    status: "ناموجود",
+    createdAt: new Date("2026-01-23"),
+  },
+  {
+    id: 4,
+    name: "هدفون بی‌سیم",
+    price: 230000,
+    stock: 23,
+    status: "موجود",
+    createdAt: new Date("2026-01-25"),
+  },
 ];
 export async function fetchProducts() {
   const res = await fetch(`/api/products`, {
