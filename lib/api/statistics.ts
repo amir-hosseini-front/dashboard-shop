@@ -1,16 +1,16 @@
-import { Product, Order } from "@/types";
+import { Order } from "@/types";
 import { products } from "./products";
 import { orders } from "./orders";
-
-const users = Array.from({ length: 5420 }, (_, i) => ({ id: `user${i + 1}` }));
+import { dbUsers } from "./users";
 
 export const db = {
   getProducts: () => products,
+  getProductById: (id: number) => products.find((u) => u.id === id),
 
   getOrders: () => orders,
 
-  getUsersCount: () => users.length,
-  getUserById: (id: string) => users.find((u) => u.id === id),
+  getUsersCount: () => dbUsers.length,
+  getUserById: (id: string) => dbUsers.find((u) => u.id === id),
   getOrdersByDateRange: (startDate: Date, endDate: Date) => {
     return orders.filter(
       (order: Order) =>

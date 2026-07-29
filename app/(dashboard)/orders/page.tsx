@@ -6,9 +6,10 @@ import OrdersTable from "@/components/dashboard/orders/OrdersTable";
 import OrderFilters from "@/components/dashboard/orders/OrderFilters";
 import OrderDetailsDialog from "@/components/dashboard/orders/OrderDetailsDialog";
 import { Plus, RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function OrdersPage() {
-  // ===== State =====
+  const router = useRouter();
   const [orders, setOrders] = useState<OrderWithUser[]>([]);
   const [pagination, setPagination] = useState({
     total: 0,
@@ -22,11 +23,9 @@ export default function OrdersPage() {
   );
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // فیلترها
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // ===== دریافت سفارشات =====
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -34,7 +33,6 @@ export default function OrdersPage() {
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
       });
-
       if (statusFilter) params.append("status", statusFilter);
       if (searchQuery) params.append("search", searchQuery);
 
@@ -50,29 +48,24 @@ export default function OrdersPage() {
       setPagination(data.pagination);
     } catch (error) {
       console.error("Error fetching orders:", error);
-      // می‌توانید یک toast یا alert نمایش دهید
     } finally {
       setLoading(false);
     }
   };
 
-  // ===== بارگذاری اولیه و هنگام تغییر فیلترها =====
   useEffect(() => {
     fetchOrders();
   }, [pagination.page, statusFilter, searchQuery]);
 
-  // ===== تغییر صفحه =====
   const handlePageChange = (page: number) => {
     setPagination((prev) => ({ ...prev, page }));
   };
 
-  // ===== مشاهده جزئیات سفارش =====
   const handleViewOrder = (order: OrderWithUser) => {
     setSelectedOrder(order);
     setDialogOpen(true);
   };
 
-  // ===== تغییر وضعیت سفارش =====
   const handleStatusChange = async (
     orderId: string,
     newStatus: OrderStatus,
@@ -97,21 +90,18 @@ export default function OrdersPage() {
     }
   };
 
-  // ===== ریست فیلترها =====
   const handleResetFilters = () => {
     setStatusFilter("");
     setSearchQuery("");
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
-  // ===== رفرش دستی =====
   const handleRefresh = () => {
     fetchOrders();
   };
 
   return (
     <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
-      {/* ===== Header ===== */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -130,14 +120,16 @@ export default function OrdersPage() {
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             بروزرسانی
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
+          <button
+            onClick={() => router.push("/orders/new")}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
+          >
             <Plus className="w-5 h-5" />
             سفارش جدید
           </button>
         </div>
       </div>
 
-      {/* ===== فیلترها ===== */}
       <OrderFilters
         status={statusFilter}
         search={searchQuery}
