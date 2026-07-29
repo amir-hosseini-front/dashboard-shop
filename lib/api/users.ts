@@ -1,6 +1,6 @@
 import { User } from "@/types";
 
-const users: User[] = [
+export let dbUsers: User[] = [
   {
     id: "user-1",
     name: "علی محمدی",
@@ -42,3 +42,14 @@ const users: User[] = [
     createdAt: new Date("2026-02-01"),
   },
 ];
+
+export async function fetchUsers() {
+  const res = await fetch(`/api/users`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error("خطا در دریافت محصولات");
+  return res.json();
+}

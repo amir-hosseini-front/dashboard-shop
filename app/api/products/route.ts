@@ -1,10 +1,22 @@
 import { products } from "@/lib/api/products";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 let nextId = 5;
 
-export async function GET() {
-  return NextResponse.json(products);
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const limit = parseInt(searchParams.get("limit") || "5", 10);
+  const search = searchParams.get("search") || "";
+  let filteredUsers = products;
+
+  if (search.trim() !== "") {
+    filteredUsers = products.filter((product) => {
+      const searchLower = search.toLowerCase().trim();
+
+      return product.name?.toLowerCase().includes(searchLower);
+    });
+  }
+  return NextResponse.json(filteredUsers);
 }
 
 export async function POST(request: Request) {
@@ -23,6 +35,7 @@ export async function POST(request: Request) {
     price: body.price,
     stock: body.stock,
     status: body.stock > 0 ? "موجود" : "ناموجود",
+    createdAt: new Date(),
   };
 
   products.push(newProduct);

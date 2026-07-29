@@ -23,6 +23,13 @@ export type OrderStatus =
   | "delivered"
   | "cancelled";
 
+export interface CartItem {
+  productId: number;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
 export interface Order {
   id: string;
   userId: string;
@@ -30,6 +37,14 @@ export interface Order {
   status: OrderStatus;
   createdAt: Date;
   items: OrderItem[];
+}
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+  product: Product;
 }
 export interface OrderWithUser extends Order {
   user: User;

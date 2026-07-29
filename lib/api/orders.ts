@@ -128,3 +128,13 @@ export async function fetchOrders() {
   if (!res.ok) throw new Error("خطا در دریافت محصولات");
   return res.json();
 }
+
+export async function createOrder(data: any) {
+  const res = await fetch(`${API_BASE}/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("خطا در ایجاد محصول");
+  return res.json();
+}
