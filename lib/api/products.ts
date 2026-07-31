@@ -1,5 +1,7 @@
+import { Product } from "@/types";
+
 const API_BASE = "/api";
-export let products = [
+export let products: Product[] = [
   {
     id: 1,
     name: "کیک چرمی",

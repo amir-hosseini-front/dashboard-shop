@@ -1,4 +1,5 @@
 import { products } from "@/lib/api/products";
+import { Product } from "@/types";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -26,7 +27,7 @@ export async function PUT(
   if (index === -1) {
     return NextResponse.json({ message: "محصول یافت نشد" }, { status: 404 });
   }
-  const updatedProduct = {
+  const updatedProduct: Product = {
     id: products[index].id,
     name: body.name || products[index].name,
     price: body.price !== undefined ? body.price : products[index].price,
@@ -37,6 +38,7 @@ export async function PUT(
           ? "موجود"
           : "ناموجود"
         : products[index].status,
+    createdAt: products[index].createdAt,
   };
 
   products[index] = updatedProduct;

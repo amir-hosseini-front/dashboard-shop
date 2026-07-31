@@ -7,15 +7,9 @@ import {
   fetchProducts,
   updateProduct,
 } from "@/lib/api/products";
+import { Product } from "@/types";
 import { useEffect, useState } from "react";
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  stock: number;
-  status: string;
-}
 interface ProductFormData {
   name: string;
   price: number;
