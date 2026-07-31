@@ -1,4 +1,5 @@
 import { User } from "@/types";
+const API_BASE = "/api";
 
 export let dbUsers: User[] = [
   {
@@ -50,6 +51,34 @@ export async function fetchUsers() {
       "Content-Type": "application/json",
     },
   });
-  if (!res.ok) throw new Error("خطا در دریافت محصولات");
+  if (!res.ok) throw new Error("خطا در دریافت کاربر");
+  return res.json();
+}
+
+export async function createUser(data: any) {
+  const res = await fetch(`${API_BASE}/users`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("خطا در ایجاد کاربر");
+  return res.json();
+}
+
+export async function updateUser(id: string, data: any) {
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("خطا در ویرایش کاربر");
+  return res.json();
+}
+
+export async function deleteUser(id: string) {
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("خطا در حذف کاربر");
   return res.json();
 }

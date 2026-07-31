@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   price: number;
   status: string;
+  stock: number;
   createdAt: Date;
   category?: string;
   image?: string;
@@ -12,9 +13,9 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  phone?: string;
+  phone: string;
   address?: string;
-  createdAt?: Date;
+  createdAt: Date;
 }
 export type OrderStatus =
   | "pending"
