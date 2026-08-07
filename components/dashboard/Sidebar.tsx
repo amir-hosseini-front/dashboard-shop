@@ -6,19 +6,17 @@ import {
   HomeIcon,
   ChartBarIcon,
   UserGroupIcon,
-  Cog6ToothIcon,
-  ShoppingBagIcon, // جدید
-  ShoppingCartIcon, // جدید
+  ShoppingBagIcon,
+  ShoppingCartIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 
 const navigation = [
   { name: "داشبورد", href: "/", icon: HomeIcon },
-  { name: "محصولات", href: "/products", icon: ShoppingBagIcon }, // جدید
-  { name: "سفارشات", href: "/orders", icon: ShoppingCartIcon }, // جدید
+  { name: "محصولات", href: "/products", icon: ShoppingBagIcon },
+  { name: "سفارشات", href: "/orders", icon: ShoppingCartIcon },
   { name: "آمار", href: "/statistics", icon: ChartBarIcon },
   { name: "کاربران", href: "/users", icon: UserGroupIcon },
-  { name: "تنظیمات", href: "/settings", icon: Cog6ToothIcon },
 ];
 export default function Sidebar() {
   const pathname = usePathname();
@@ -31,12 +29,10 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 bg-gray-900 text-white h-screen p-4 fixed right-0 top-0">
-      {/* لوگو */}
       <div className="text-2xl font-bold mb-8 p-3 border-b border-gray-700">
         📊 پنل من
       </div>
 
-      {/* منو */}
       <nav className="space-y-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href;
@@ -56,7 +52,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      {/* دکمه خروج */}
       <button
         onClick={handleLogout}
         className="flex items-center w-full gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all mt-4  pt-4"
@@ -65,7 +60,6 @@ export default function Sidebar() {
         <span className="font-medium">خروج</span>
       </button>
 
-      {/* فوتر */}
       <div className="absolute bottom-4 right-4 left-4 text-center text-xs text-gray-500">
         v1.0.0
       </div>
