@@ -2,7 +2,7 @@ import { StatisticsData } from "@/types";
 import StatsCards from "@/components/dashboard/StatsCards";
 import PeriodStats from "@/components/dashboard/PeriodStats";
 import SalesChart from "@/components/dashboard/SalesChart";
-import OrderStatus from "@/components/dashboard/OrderStatus";
+import OrderStatus from "@/components/dashboard/orders/OrderStatus";
 
 // این تابع در سرور اجرا میشه و دیتا رو از API میگیره
 async function getStatistics(): Promise<StatisticsData> {

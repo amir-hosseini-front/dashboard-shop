@@ -1,49 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { OrderWithUser, OrderStatus, OrdersResponse } from "@/types";
 import OrdersTable from "@/components/dashboard/orders/OrdersTable";
 import OrderFilters from "@/components/dashboard/orders/OrderFilters";
 import OrderDetailsDialog from "@/components/dashboard/orders/OrderDetailsDialog";
 import { Plus, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
+const DEFAULT_PAGINATION = { total: 0, page: 1, limit: 10, totalPages: 1 };
 
 export default function OrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<OrderWithUser[]>([]);
-  const [pagination, setPagination] = useState({
-    total: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 1,
-  });
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithUser | null>(
     null,
   );
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [filters, setFilters] = useState({ status: "", search: "" });
 
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
+        ...(filters.status && { status: filters.status }),
+        ...(filters.search && { search: filters.search }),
       });
-      if (statusFilter) params.append("status", statusFilter);
-      if (searchQuery) params.append("search", searchQuery);
 
       const res = await fetch(`/api/orders?${params}`);
-
-      if (!res.ok) {
-        throw new Error("خطا در دریافت سفارشات");
-      }
+      if (!res.ok) throw new Error("خطا در دریافت سفارشات");
 
       const data: OrdersResponse = await res.json();
-
       setOrders(data.orders);
       setPagination(data.pagination);
     } catch (error) {
@@ -51,11 +41,11 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.page, filters]);
 
   useEffect(() => {
     fetchOrders();
-  }, [pagination.page, statusFilter, searchQuery]);
+  }, [fetchOrders]);
 
   const handlePageChange = (page: number) => {
     setPagination((prev) => ({ ...prev, page }));
@@ -81,7 +71,6 @@ export default function OrdersPage() {
         throw new Error("Failed to update status");
       }
 
-      // رفرش لیست
       await fetchOrders();
       setDialogOpen(false);
     } catch (error) {
@@ -90,14 +79,14 @@ export default function OrdersPage() {
     }
   };
 
-  const handleResetFilters = () => {
-    setStatusFilter("");
-    setSearchQuery("");
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
-  const handleRefresh = () => {
-    fetchOrders();
+  const resetFilters = () => {
+    setFilters({ status: "", search: "" });
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   return (
@@ -113,7 +102,7 @@ export default function OrdersPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={handleRefresh}
+            onClick={fetchOrders}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
           >
@@ -131,11 +120,11 @@ export default function OrdersPage() {
       </div>
 
       <OrderFilters
-        status={statusFilter}
-        search={searchQuery}
-        onStatusChange={setStatusFilter}
-        onSearchChange={setSearchQuery}
-        onReset={handleResetFilters}
+        status={filters.status}
+        search={filters.search}
+        onStatusChange={(value) => handleFilterChange("status", value)}
+        onSearchChange={(value) => handleFilterChange("search", value)}
+        onReset={resetFilters}
       />
 
       {/* ===== جدول سفارشات ===== */}
