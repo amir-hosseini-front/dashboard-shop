@@ -1,8 +1,8 @@
 "use client";
 
-import { createProduct, updateProduct } from "@/lib/api/products";
+import { useProducts } from "@/lib/hooks/useProducts";
 import { useState, useEffect } from "react";
-
+import { useForm } from "react-hook-form";
 interface Product {
   id: number;
   name: string;
@@ -10,7 +10,11 @@ interface Product {
   stock: number;
   status: string;
 }
-
+type FormData = {
+  name: string;
+  price: number;
+  stock: number;
+};
 interface ProductFormProps {
   product?: Product | null;
   onSuccess: () => void;
@@ -22,69 +26,27 @@ export default function ProductForm({
   onSuccess,
   onCancel,
 }: ProductFormProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    price: 0,
-    stock: 0,
-  });
+  const { addProduct, editProduct } = useProducts();
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      name: product?.name,
+      price: product?.price,
+      stock: product?.stock,
+    },
+  });
 
-  // وقتی product تغییر میکنه (برای ویرایش)، فرم رو پر کن
-  useEffect(() => {
-    if (product) {
-      setFormData({
-        name: product.name || "",
-        price: product.price || 0,
-        stock: product.stock || 0,
-      });
-    } else {
-      setFormData({
-        name: "",
-        price: 0,
-        stock: 0,
-      });
-    }
-  }, [product]);
-
-  // اعتبارسنجی فرم
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "نام محصول الزامی است";
-    }
-
-    if (formData.price < 0) {
-      newErrors.price = "قیمت نمی‌تواند منفی باشد";
-    }
-
-    if (formData.stock < 0) {
-      newErrors.stock = "موجودی نمی‌تواند منفی باشد";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // اعتبارسنجی
-    if (!validateForm()) {
-      return;
-    }
-
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
-    setErrors({});
-
     try {
       if (product) {
-        // ویرایش
-        await updateProduct(product.id, formData);
+        await editProduct(product.id, data);
       } else {
-        // ایجاد جدید
-        await createProduct(formData);
+        await addProduct(data);
       }
       onSuccess();
     } catch (err) {
@@ -95,30 +57,40 @@ export default function ProductForm({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "price" || name === "stock" ? Number(value) : value,
-    }));
-    // پاک کردن خطای مربوط به این فیلد
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!validateForm()) {
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   setErrors({});
+
+  //   try {
+  //     if (product) {
+  //       await updateProduct(product.id, formData);
+  //     } else {
+  //       await createProduct(formData);
+  //     }
+  //     onSuccess();
+  //   } catch (err) {
+  //     alert("خطا در ذخیره محصول");
+  //     console.error(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* نام محصول */}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           نام محصول <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleInputChange}
+          {...register("name", { required: " نام محصول الزامی است " })}
           className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
             errors.name ? "border-red-500" : "border-gray-300"
           }`}
@@ -126,20 +98,19 @@ export default function ProductForm({
           disabled={loading}
         />
         {errors.name && (
-          <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
         )}
       </div>
 
-      {/* قیمت */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           قیمت (تومان) <span className="text-red-500">*</span>
         </label>
         <input
           type="number"
-          name="price"
-          value={formData.price}
-          onChange={handleInputChange}
+          {...register("price", {
+            required: "قیمت نمی تواند صفر باشد",
+          })}
           className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
             errors.price ? "border-red-500" : "border-gray-300"
           }`}
@@ -148,20 +119,19 @@ export default function ProductForm({
           disabled={loading}
         />
         {errors.price && (
-          <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>
         )}
       </div>
 
-      {/* موجودی */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           موجودی <span className="text-red-500">*</span>
         </label>
         <input
           type="number"
-          name="stock"
-          value={formData.stock}
-          onChange={handleInputChange}
+          {...register("stock", {
+            required: "موجودی نمی‌تواند منفی باشد",
+          })}
           className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
             errors.stock ? "border-red-500" : "border-gray-300"
           }`}
@@ -170,11 +140,10 @@ export default function ProductForm({
           disabled={loading}
         />
         {errors.stock && (
-          <p className="text-red-500 text-sm mt-1">{errors.stock}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>
         )}
       </div>
 
-      {/* دکمه‌ها */}
       <div className="flex gap-3 pt-4">
         <button
           type="submit"

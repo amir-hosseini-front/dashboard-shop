@@ -7,87 +7,28 @@ import OrderFilters from "@/components/dashboard/orders/OrderFilters";
 import OrderDetailsDialog from "@/components/dashboard/orders/OrderDetailsDialog";
 import { Plus, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useOrders } from "@/lib/hooks/useOrders";
 const DEFAULT_PAGINATION = { total: 0, page: 1, limit: 10, totalPages: 1 };
 
 export default function OrdersPage() {
+  const {
+    orders,
+    loading,
+    error,
+    dialogOpen,
+    pagination,
+    selectedOrder,
+    filters,
+    addOrder,
+    loadOrders,
+    handlePageChange,
+    handleStatusChange,
+    handleFilterChange,
+    handleViewOrder,
+    handleDialogOpen,
+    resetFilters,
+  } = useOrders();
   const router = useRouter();
-  const [orders, setOrders] = useState<OrderWithUser[]>([]);
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState<OrderWithUser | null>(
-    null,
-  );
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [filters, setFilters] = useState({ status: "", search: "" });
-
-  const fetchOrders = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-        ...(filters.status && { status: filters.status }),
-        ...(filters.search && { search: filters.search }),
-      });
-
-      const res = await fetch(`/api/orders?${params}`);
-      if (!res.ok) throw new Error("خطا در دریافت سفارشات");
-
-      const data: OrdersResponse = await res.json();
-      setOrders(data.orders);
-      setPagination(data.pagination);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.page, filters]);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }));
-  };
-
-  const handleViewOrder = (order: OrderWithUser) => {
-    setSelectedOrder(order);
-    setDialogOpen(true);
-  };
-
-  const handleStatusChange = async (
-    orderId: string,
-    newStatus: OrderStatus,
-  ) => {
-    try {
-      const res = await fetch(`/api/orders/${orderId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to update status");
-      }
-
-      await fetchOrders();
-      setDialogOpen(false);
-    } catch (error) {
-      console.error("Error updating status:", error);
-      alert("خطا در تغییر وضعیت سفارش");
-    }
-  };
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  };
-
-  const resetFilters = () => {
-    setFilters({ status: "", search: "" });
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  };
 
   return (
     <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
@@ -102,7 +43,7 @@ export default function OrdersPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={fetchOrders}
+            onClick={loadOrders}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
           >
@@ -140,7 +81,7 @@ export default function OrdersPage() {
       <OrderDetailsDialog
         order={selectedOrder}
         isOpen={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={() => handleDialogOpen(false)}
         onStatusChange={handleStatusChange}
       />
     </div>
