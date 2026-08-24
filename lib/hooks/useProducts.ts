@@ -16,14 +16,15 @@ interface ProductFormData {
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   const loadProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
       const data = await fetchProducts();
+      console.log(data);
       setProducts(data);
     } catch (err) {
       setError("خطا در دریافت محصولات");
@@ -35,12 +36,10 @@ export function useProducts() {
 
   const addProduct = async (data: ProductFormData) => {
     await createProduct(data);
-    await loadProducts();
   };
 
   const editProduct = async (id: number, data: ProductFormData) => {
     await updateProduct(id, data);
-    await loadProducts();
   };
 
   const removeProduct = async (id: number) => {

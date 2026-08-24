@@ -6,17 +6,17 @@ import ProductForm from "@/components/dashboard/product/ProductForm";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useProducts } from "@/lib/hooks/useProducts";
 import { Column, CoreTable } from "@/components/ui/CoreTable";
+import { LoadingSpinner } from "@/components/dashboard/shared/LoadingSpinner";
+import { ErrorMessage } from "@/components/dashboard/shared/ErrorMessage";
 
 export default function ProductsPage() {
-  const { products, loading, error, addProduct, editProduct, removeProduct } =
+  const { products, loading, error, removeProduct, loadProducts } =
     useProducts();
   const [modalState, setModalState] = useState<{
     open: boolean;
     product?: Product | null;
   }>({ open: false });
-  const [submitting, setSubmitting] = useState(false);
 
-  // تعریف ستون‌های جدول
   const columns: Column<Product>[] = [
     {
       key: "index",
@@ -79,8 +79,10 @@ export default function ProductsPage() {
   ];
 
   const handleAddNew = () => setModalState({ open: true, product: null });
+
   const handleEdit = (product: Product) =>
     setModalState({ open: true, product });
+
   const handleCloseModal = () => setModalState({ open: false });
 
   const handleDelete = async (id: number) => {
@@ -94,12 +96,8 @@ export default function ProductsPage() {
   };
 
   const handleSuccess = async () => {
-    setSubmitting(true);
-    try {
-      setModalState({ open: false });
-    } finally {
-      setSubmitting(false);
-    }
+    setModalState({ open: false });
+    loadProducts();
   };
 
   if (loading) return <LoadingSpinner />;
@@ -151,22 +149,6 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function LoadingSpinner() {
-  return (
-    <div className="flex justify-center items-center h-64">
-      <div className="text-xl text-gray-600">در حال بارگذاری...</div>
-    </div>
-  );
-}
-
-function ErrorMessage({ message }: { message: string }) {
-  return (
-    <div className="flex justify-center items-center h-64">
-      <div className="text-xl text-red-600">{message}</div>
     </div>
   );
 }
